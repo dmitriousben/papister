@@ -1,0 +1,26 @@
+[
+  {
+    "url":    "https://httpbin.org/get",
+    "method": "GET",
+    "tags":   ["smoke", "public"],
+    "note":   "Basic GET test"
+  },
+  {
+    "url":    "https://httpbin.org/post",
+    "method": "POST",
+    "json_body": { "tool": "papister", "version": "0.1.0" },
+    "tags":   ["smoke", "public"]
+  },
+  {
+    "url":    "https://httpbin.org/status/401",
+    "method": "GET",
+    "tags":   ["smoke", "auth-fail"],
+    "note":   "Expect 401 — tests auth_fail detection"
+  },
+  {
+    "url":    "https://httpbin.org/delay/2",
+    "method": "GET",
+    "tags":   ["smoke", "timing"],
+    "note":   "Slow endpoint — 2s delay"
+  }
+]

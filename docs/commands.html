@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Papister — Command Reference</title>
+<style>
+  :root {
+    --bg:      #0d1117;
+    --surface: #161b22;
+    --border:  #30363d;
+    --cyan:    #38bdf8;
+    --green:   #22c55e;
+    --yellow:  #eab308;
+    --red:     #ef4444;
+    --purple:  #a78bfa;
+    --dim:     #6e7681;
+    --text:    #c9d1d9;
+    --white:   #f0f6fc;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+  }
+
+  /* ── Sidebar ── */
+  .layout { display: flex; min-height: 100vh; }
+  .sidebar {
+    width: 220px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 24px 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+  .sidebar h2 {
+    color: var(--cyan);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: 0 20px 12px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+  .sidebar a {
+    display: block;
+    padding: 7px 20px;
+    color: var(--dim);
+    text-decoration: none;
+    font-size: 13px;
+    transition: all .15s;
+  }
+  .sidebar a:hover { color: var(--white); background: #ffffff08; }
+  .sidebar .group-label {
+    color: var(--dim);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 16px 20px 4px;
+  }
+
+  /* ── Main ── */
+  .main {
+    flex: 1;
+    padding: 40px 48px;
+    max-width: 960px;
+  }
+
+  /* ── Hero ── */
+  .hero { margin-bottom: 48px; }
+  .hero pre {
+    color: var(--cyan);
+    font-size: 11px;
+    line-height: 1.2;
+    margin-bottom: 12px;
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+  }
+  .hero h1 { font-size: 28px; color: var(--white); margin-bottom: 6px; }
+  .hero p  { color: var(--dim); font-size: 15px; }
+  .badge {
+    display: inline-block;
+    background: var(--cyan);
+    color: #0d1117;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 20px;
+    margin-right: 6px;
+  }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 52px; scroll-margin-top: 24px; }
+  .section-title {
+    color: var(--white);
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-icon { font-size: 22px; }
+
+  /* ── Command cards ── */
+  .cmd-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .cmd-header {
+    padding: 14px 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    border-bottom: 1px solid var(--border);
+    background: #0d1117;
+  }
+  .cmd-name {
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+    font-size: 14px;
+    color: var(--cyan);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .cmd-desc { color: var(--text); font-size: 14px; line-height: 1.5; }
+  .cmd-body { padding: 14px 18px; }
+
+  /* ── Code blocks ── */
+  .code-block {
+    background: #010409;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 12px 16px;
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+    font-size: 13px;
+    overflow-x: auto;
+    margin: 8px 0;
+    line-height: 1.7;
+  }
+  .code-block .comment { color: var(--dim); }
+  .code-block .cmd     { color: var(--green); }
+  .code-block .flag    { color: var(--yellow); }
+  .code-block .val     { color: var(--purple); }
+  .code-block .url     { color: var(--cyan); }
+
+  /* ── Flags table ── */
+  .flags-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+  .flags-table th {
+    text-align: left;
+    color: var(--dim);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .flags-table td { padding: 7px 10px; border-bottom: 1px solid #1c2128; vertical-align: top; }
+  .flags-table tr:last-child td { border-bottom: none; }
+  .flag-name { font-family: monospace; color: var(--yellow); }
+  .flag-default { color: var(--purple); font-family: monospace; }
+
+  /* ── Tags ── */
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-right: 4px;
+    font-weight: 600;
+  }
+  .tag-danger  { background: #ef444422; color: var(--red);    border: 1px solid #ef444444; }
+  .tag-warn    { background: #eab30822; color: var(--yellow); border: 1px solid #eab30844; }
+  .tag-info    { background: #38bdf822; color: var(--cyan);   border: 1px solid #38bdf844; }
+  .tag-success { background: #22c55e22; color: var(--green);  border: 1px solid #22c55e44; }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ══ Sidebar ══════════════════════════════════════════════════════ -->
+  <nav class="sidebar">
+    <h2>Papister</h2>
+    <div class="group-label">Core</div>
+    <a href="#scan">scan</a>
+    <a href="#test">test</a>
+    <a href="#add">add</a>
+
+    <div class="group-label">Security</div>
+    <a href="#sqli">sqli</a>
+    <a href="#fuzz">fuzz</a>
+    <a href="#headers">headers</a>
+    <a href="#fingerprint">fingerprint</a>
+    <a href="#mailprobe">mailprobe</a>
+
+    <div class="group-label">CVE</div>
+    <a href="#cve">cve update</a>
+    <a href="#cve-check">cve check</a>
+
+    <div class="group-label">Auth</div>
+    <a href="#auth-set">auth set</a>
+    <a href="#auth-list">auth list</a>
+
+    <div class="group-label">Proxy</div>
+    <a href="#proxy-start">proxy start</a>
+    <a href="#proxy-replay">proxy replay</a>
+
+    <div class="group-label">Integrations</div>
+    <a href="#integrations">integrations list</a>
+    <a href="#integrations-run">integrations run</a>
+
+    <div class="group-label">Utility</div>
+    <a href="#history">history</a>
+    <a href="#report">report</a>
+    <a href="#version">version</a>
+    <a href="#docs">docs</a>
+  </nav>
+
+  <!-- ══ Main ═════════════════════════════════════════════════════════ -->
+  <main class="main">
+
+    <!-- Hero -->
+    <div class="hero">
+      <pre>
+  ██████╗  █████╗ ██████╗ ██╗███████╗████████╗███████╗██████╗
+  ██╔══██╗██╔══██╗██╔══██╗██║██╔════╝╚══██╔══╝██╔════╝██╔══██╗
+  ██████╔╝███████║██████╔╝██║███████╗   ██║   █████╗  ██████╔╝
+  ██╔═══╝ ██╔══██║██╔═══╝ ██║╚════██║   ██║   ██╔══╝  ██╔══██╗
+  ██║     ██║  ██║██║     ██║███████║   ██║   ███████╗██║  ██║
+  ╚═╝     ╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝   ╚═╝   ╚══════╝╚═╝  ╚═╝</pre>
+      <h1>Command Reference</h1>
+      <p>Local API Security &amp; Testing Toolkit &nbsp;·&nbsp;
+         <span class="badge">v0.1.0</span>
+         <span class="badge" style="background:var(--green)">Local Only</span>
+         <span class="badge" style="background:var(--purple)">CLI First</span>
+      </p>
+    </div>
+
+    <!-- ══ CORE ══════════════════════════════════════════════════════ -->
+    <div class="section" id="scan">
+      <div class="section-title"><span class="section-icon">🔎</span> Core — Scanning</div>
+
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <div class="cmd-name">papister scan &lt;file&gt;</div>
+          <div class="cmd-desc">Scan all endpoints from a collection file (.txt / .yaml / .json). Prints live results, summary, and writes JSON + HTML reports.</div>
+        </div>
+        <div class="cmd-body">
+          <div class="code-block">
+<span class="comment"># Scan a .txt file in sandbox mode (default)</span>
+<span class="cmd">python cli.py scan</span> <span class="url">endpoints/endpoints.txt</span>
+
+<span class="comment"># Scan a YAML collection in production mode</span>
+<span class="cmd">python cli.py scan</span> <span class="url">endpoints/endpoints.yaml</span> <span class="flag">--mode P</span>
+
+<span class="comment"># Custom timeout + retries + proxy</span>
+<span class="cmd">python cli.py scan</span> <span class="url">endpoints/endpoints.json</span> <span class="flag">--timeout 30 --retries 3 --proxy</span> <span class="val">http://127.0.0.1:8080</span>
+
+<span class="comment"># Skip SSL verification (dev certs)</span>
+<span class="cmd">python cli.py scan</span> <span class="url">endpoints/endpoints.yaml</span> <span class="flag">--no-ssl-verify</span>
+          </div>
+          <table class="flags-table">
+            <tr><th>Flag</th><th>Default</th><th>Description</th></tr>
+            <tr><td class="flag-name">--mode S|P</td><td class="flag-default">S</td><td>S = Sandbox · P = Production (requires confirm)</td></tr>
+            <tr><td class="flag-name">--timeout</td><td class="flag-default">15</td><td>Seconds per request before timeout</td></tr>
+            <tr><td class="flag-name">--retries</td><td class="flag-default">2</td><td>Retry count on 5xx responses</td></tr>
+            <tr><td class="flag-name">--proxy</td><td class="flag-default">None</td><td>Route requests through a proxy URL</td></tr>
+            <tr><td class="flag-name">--no-ssl-verify</td><td class="flag-default">off</td><td>Disable SSL cert verification</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- test -->
+    <div class="section" id="test">
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <div class="cmd-name">papister test &lt;url&gt;</div>
+          <div class="cmd-desc">Test a single endpoint. Shows full result detail inline.</div>
+        </div>
+        <div class="cmd-body">
+          <div class="code-block">
+<span class="cmd">python cli.py test</span> <span class="url">https://api.example.com/v1/users</span>
+<span class="cmd">python cli.py test</span> <span class="url">https://api.example.com/v1/login</span> <span class="flag">--method POST --auth</span> <span class="val">my_bearer</span>
+<span class="cmd">python cli.py test</span> <span class="url">https://api.example.com/v1/data</span> <span class="flag">--mode P</span>
+          </div>
+          <table class="flags-table">
+            <tr><th>Flag</th><th>Default</th><th>Description</th></tr>
+            <tr><td class="flag-name">--method / -X</td><td class="flag-default">GET</td><td>HTTP method</td></tr>
+            <tr><td class="flag-name">--mode / -m</td><td class="flag-default">S</td><td>S or P</td></tr>
+            <tr><td class="flag-name">--auth / -a</td><td class="flag-default">None</td><td>Name of saved auth profile</td></tr>
+            <tr><td class="flag-name">--proxy</td><td class="flag-default">None</td><td>Proxy URL</td></tr>
+            <tr><td class="flag-name">--timeout / -t</td><td class="flag-default">15</td><td>Timeout in seconds</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- add -->
+    <div class="section" id="add">
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <div class="cmd-name">papister add &lt;url&gt;</div>
+          <div class="cmd-desc">Add a newly discovered endpoint to storage/discovered.yaml and the local DB.</div>
+        </div>
+        <div class="cmd-body">
+          <div class="code-block">
+<span class="cmd">python cli.py add</span> <span class="url">https://api.example.com/v1/internal/debug</span>
+<span class="cmd">python cli.py add</span> <span class="url">https://api.example.com/v1/admin</span> <span class="flag">--method POST</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SECURITY ══════════════════════════════════════════════════ -->
+    <div class="section" id="sqli">
+      <div class="section-title"><span class="section-icon">💉</span> Security</div>
+
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <span class="tag tag-danger">DEEP</span>
+          <div>
+            <div class="cmd-name">papister sqli &lt;url|file&gt;</div>
+            <div class="cmd-desc">Deep SQL injection testing. Runs error-based, boolean-blind, time-based, and stacked query detection.</div>
+          </div>
+        </div>
+        <div class="cmd-body">
+          <div class="code-block">
+<span class="comment"># Test a single URL (level 1 = error-based only)</span>
+<span class="cmd">python cli.py sqli</span> <span class="url">https://api.example.com/v1/users?id=1</span> <span class="flag">--level 1</span>
+
+<span class="comment"># Level 2 adds boolean-blind</span>
+<span class="cmd">python cli.py sqli</span> <span class="url">https://api.example.com/v1/items?search=test</span> <span class="flag">--level 2</span>
+
+<span class="comment"># Level 3 adds time-based + stacked (deepest)</span>
+<span class="cmd">python cli.py sqli</span> <span class="url">endpoints/endpoints.yaml</span> <span class="flag">--level 3 --timeout 30</span>
+          </div>
+          <table class="flags-table">
+            <tr><th>Flag</th><th>Default</th><th>Description</th></tr>
+            <tr><td class="flag-name">--level / -l</td><td class="flag-default">2</td><td>1=error · 2=+boolean-blind · 3=+time+stacked</td></tr>
+            <tr><td class="flag-name">--timeout / -t</td><td class="flag-default">20</td><td>Higher timeout needed for time-based checks</td></tr>
+            <tr><td class="flag-name">--proxy</td><td class="flag-default">None</td><td>Route through proxy</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" id="fuzz">
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <span class="tag tag-warn">FUZZ</span>
+          <div>
+            <div class="cmd-name">papister fuzz &lt;url&gt;</div>
+            <div class="cmd-desc">Fuzz endpoint parameters with unexpected values — nulls, oversized strings, type confusion, path traversal, template injection.</div>
+          </div>
+        </div>
+        <div class="cmd-body">
+          <div class="code-block">
+<span class="cmd">python cli.py fuzz</span> <span class="url">https://api.example.com/v1/users?id=1</span>
+<span class="cmd">python cli.py fuzz</span> <span class="url">https://api.example.com/v1/search?q=test</span> <span class="flag">--method POST</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" id="headers">
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <span class="tag tag-info">HEADERS</span>
+          <div>
+            <div class="cmd-name">papister headers &lt;url&gt;</div>
+            <div class="cmd-desc">Audit security headers — HSTS, CSP, X-Frame-Options, CORS misconfiguration, exposed server info. Gives a security score 0–100.</div>
+          </div>
+        </div>
+        <div class="cmd-body">
+          <div class="code-block">
+<span class="cmd">python cli.py headers</span> <span class="url">https://api.example.com</span>
+<span class="cmd">python cli.py headers</span> <span class="url">https://api.example.com</span> <span class="flag">--proxy http://127.0.0.1:8787</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" id="fingerprint">
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <span class="tag tag-info">FINGERPRINT</span>
+          <div>
+            <div class="cmd-name">papister fingerprint &lt;url&gt;</div>
+            <div class="cmd-desc">Detect the full backend stack — web server, framework, language, cloud provider, Redis exposure, Spring Boot Actuator, Kafka, message brokers. Cross-references detected versions against local CVE DB.</div>
+          </div>
+        </div>
+        <div class="cmd-body">
+          <div class="code-block">
+<span class="cmd">python cli.py fingerprint</span> <span class="url">https://api.example.com</span>
+<span class="cmd">python cli.py fingerprint</span> <span class="url">https://api.example.com</span> <span class="flag">--no-cve</span>
+          </div>
+          <table class="flags-table">
+            <tr><th>Flag</th><th>Default</th><th>Description</th></tr>
+            <tr><td class="flag-name">--cve / --no-cve</td><td class="flag-default">--cve</td><td>Cross-check detected versions against CVE DB</td></tr>
+            <tr><td class="flag-name">--proxy</td><td class="flag-default">None</td><td>Proxy URL</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" id="mailprobe">
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <span class="tag tag-warn">MAIL</span>
+          <div>
+            <div class="cmd-name">papister mailprobe &lt;host&gt;</div>
+            <div class="cmd-desc">Probe POP3, IMAP, SMTP endpoints. Reads banners, capabilities, auth methods. Useful for testing telecom/ISP mail API gateways.</div>
+          </div>
+        </div>
+        <div class="cmd-body">
+          <div class="code-block">
+<span class="cmd">python cli.py mailprobe</span> <span class="val">mail.example.com</span>
+<span class="cmd">python cli.py mailprobe</span> <span class="val">mail.example.com</span> <span class="flag">--port 995</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CVE ═══════════════════════════════════════════════════════ -->
+    <div class="section" id="cve">
+      <div class="section-title"><span class="section-icon">🛡️</span> CVE Database</div>
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <div class="cmd-name">papister cve update</div>
+          <div class="cmd-desc">Pull the latest NVD CVE feed into the local cve.db. Run periodically to keep findings current.</div>
+        </div>
+        <div class="cmd-body">
+          <div class="code-block">
+<span class="cmd">python cli.py cve update</span>
+          </div>
+        </div>
+      </div>
+      <div class="cmd-card" id="cve-check">
+        <div class="cmd-header">
+          <div class="cmd-name">papister cve check &lt;tech&gt; &lt;version&gt;</div>
+          <div class="cmd-desc">Manual CVE lookup for a specific technology and version string.</div>
+        </div>
+        <div class="cmd-body">
+          <div class="code-block">
+<span class="cmd">python cli.py cve check</span> <span class="val">nginx 1.18.0</span>
+<span class="cmd">python cli.py cve check</span> <span class="val">spring-boot 2.5.4</span>
+<span class="cmd">python cli.py cve check</span> <span class="val">django 3.2.0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ AUTH ══════════════════════════════════════════════════════ -->
+    <div class="section" id="auth-set">
+      <div class="section-title"><span class="section-icon">🔑</span> Auth Profiles</div>
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <div class="cmd-name">papister auth set &lt;name&gt;</div>
+          <div class="cmd-desc">Interactively configure and save an auth profile. Profiles are stored in the local DB and referenced by name in scans.</div>
+        </div>
+        <div class="cmd-body">
+          <div class="code-block">
+<span class="comment"># API Key header auth</span>
+<span class="cmd">python cli.py auth set</span> <span class="val">my_api_key</span> <span class="flag">--type apikey</span>
+
+<span class="comment"># OAuth2 Bearer token</span>
+<span class="cmd">python cli.py auth set</span> <span class="val">my_bearer</span> <span class="flag">--type oauth2</span>
+
+<span class="comment"># OAuth1 consumer key + secret (Mpesa, etc.)</span>
+<span class="cmd">python cli.py auth set</span> <span class="val">mpesa_consumer</span> <span class="flag">--type oauth1</span>
+
+<span class="comment"># HTTP Basic</span>
+<span class="cmd">python cli.py auth set</span> <span class="val">my_basic</span> <span class="flag">--type basic</span>
+
+<span class="comment"># Custom raw headers</span>
+<span class="cmd">python cli.py auth set</span> <span class="val">custom_till</span> <span class="flag">--type custom</span>
+          </div>
+          <p style="color:var(--dim);font-size:13px;margin-top:10px">
+            Then reference in collection files: <code style="color:var(--yellow)">auth_profile: my_bearer</code><br>
+            Or on CLI: <code style="color:var(--yellow)">papister test &lt;url&gt; --auth my_bearer</code>
+          </p>
+        </div>
+      </div>
+      <div class="cmd-card" id="auth-list">
+        <div class="cmd-header">
+          <div class="cmd-name">papister auth list</div>
+          <div class="cmd-desc">List all saved auth profiles.</div>
+        </div>
+        <div class="cmd-body">
+          <div class="code-block"><span class="cmd">python cli.py auth list</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PROXY ══════════════════════════════════════════════════════ -->
+    <div class="section" id="proxy-start">
+      <div class="section-title"><span class="section-icon">🔌</span> Intercept Proxy</div>
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <span class="tag tag-info">PROXY</span>
+          <div>
+            <div class="cmd-name">papister proxy start</div>
+            <div class="cmd-desc">Start the built-in intercept proxy on 127.0.0.1:8787. All requests are logged and can be replayed.</div>
+          </div>
+        </div>
+        <div class="cmd-body">
+          <div class="code-block">
+<span class="cmd">python cli.py proxy start</span>
+<span class="cmd">python cli.py proxy start</span> <span class="flag">--port 9090</span>
+          </div>
+        </div>
+      </div>
+      <div class="cmd-card" id="proxy-replay">
+        <div class="cmd-header">
+          <div class="cmd-name">papister proxy replay &lt;request-id&gt;</div>
+          <div class="cmd-desc">Replay a previously captured request by its ID (shown during capture).</div>
+        </div>
+        <div class="cmd-body">
+          <div class="code-block">
+<span class="cmd">python cli.py proxy replay</span> <span class="val">a1b2c3d4</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ INTEGRATIONS ════════════════════════════════════════════════ -->
+    <div class="section" id="integrations">
+      <div class="section-title"><span class="section-icon">🔗</span> Integrations</div>
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <div class="cmd-name">papister integrations list</div>
+          <div class="cmd-desc">Show all available third-party integration test suites.</div>
+        </div>
+        <div class="cmd-body">
+          <div class="code-block"><span class="cmd">python cli.py integrations list</span></div>
+          <table class="flags-table" style="margin-top:12px">
+            <tr><th>Name</th><th>Description</th></tr>
+            <tr><td class="flag-name">mpesa</td><td>Safaricom Daraja — OAuth, STK Push, C2B, B2C, Balance</td></tr>
+            <tr><td class="flag-name">africastalking</td><td>Africa's Talking — SMS, USSD, Voice, Airtime</td></tr>
+            <tr><td class="flag-name">flutterwave</td><td>Flutterwave — Card, Mobile Money, Bank Transfer</td></tr>
+            <tr><td class="flag-name">stripe</td><td>Stripe — Charges, Customers, Webhooks</td></tr>
+            <tr><td class="flag-name">twilio</td><td>Twilio — SMS, Voice, Verify</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="cmd-card" id="integrations-run">
+        <div class="cmd-header">
+          <div class="cmd-name">papister integrations run &lt;name&gt;</div>
+          <div class="cmd-desc">Run a full integration test suite. Use --mode S for sandbox, P for production.</div>
+        </div>
+        <div class="cmd-body">
+          <div class="code-block">
+<span class="cmd">python cli.py integrations run mpesa</span> <span class="flag">--mode S --auth</span> <span class="val">mpesa_consumer</span>
+<span class="cmd">python cli.py integrations run stripe</span> <span class="flag">--mode S --auth</span> <span class="val">stripe_key</span>
+<span class="cmd">python cli.py integrations run africastalking</span> <span class="flag">--mode P --auth</span> <span class="val">at_key</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ UTILITY ════════════════════════════════════════════════════ -->
+    <div class="section" id="history">
+      <div class="section-title"><span class="section-icon">📋</span> History &amp; Reports</div>
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <div class="cmd-name">papister history</div>
+          <div class="cmd-desc">Show past scan runs stored in local SQLite DB.</div>
+        </div>
+        <div class="cmd-body">
+          <div class="code-block">
+<span class="cmd">python cli.py history</span>
+<span class="cmd">python cli.py history</span> <span class="flag">--limit 50</span>
+<span class="cmd">python cli.py history-show</span> <span class="val">42</span>
+          </div>
+        </div>
+      </div>
+      <div class="cmd-card" id="report">
+        <div class="cmd-header">
+          <div class="cmd-name">papister report [timestamp]</div>
+          <div class="cmd-desc">Open an HTML report in the browser. No argument = latest report.</div>
+        </div>
+        <div class="cmd-body">
+          <div class="code-block">
+<span class="cmd">python cli.py report</span>
+<span class="cmd">python cli.py report</span> <span class="val">20240601_143022</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" id="version">
+      <div class="section-title"><span class="section-icon">ℹ️</span> Utility</div>
+      <div class="cmd-card">
+        <div class="cmd-header">
+          <div class="cmd-name">papister version</div>
+          <div class="cmd-desc">Show current Papister version and CVE DB last-updated date.</div>
+        </div>
+        <div class="cmd-body">
+          <div class="code-block"><span class="cmd">python cli.py version</span></div>
+        </div>
+      </div>
+      <div class="cmd-card" id="docs">
+        <div class="cmd-header">
+          <div class="cmd-name">papister docs</div>
+          <div class="cmd-desc">Open this command reference page in the browser.</div>
+        </div>
+        <div class="cmd-body">
+          <div class="code-block"><span class="cmd">python cli.py docs</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="margin-top:60px;padding-top:20px;border-top:1px solid var(--border);color:var(--dim);font-size:13px">
+      Papister v0.1.0 &nbsp;·&nbsp; Local API Security &amp; Testing Toolkit &nbsp;·&nbsp;
+      <code style="color:var(--cyan)">python cli.py --help</code> for CLI help
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>
+<!-- BOLA & VAULT appended -->
+<script>
+// Inject BOLA and Vault into sidebar and main after page loads
+document.addEventListener('DOMContentLoaded', function() {
+
+  // ── Sidebar entries ────────────────────────────────────────────────────
+  const sidebar = document.querySelector('.sidebar');
+
+  const bolaGroup = document.createElement('div');
+  bolaGroup.innerHTML = `
+    <div class="group-label">BOLA</div>
+    <a href="#bola">bola</a>
+  `;
+  sidebar.appendChild(bolaGroup);
+
+  const vaultGroup = document.createElement('div');
+  vaultGroup.innerHTML = `
+    <div class="group-label">Vault</div>
+    <a href="#vault-set">vault set</a>
+    <a href="#vault-list">vault list</a>
+    <a href="#vault-rotate">vault rotate</a>
+    <a href="#vault-providers">vault providers</a>
+  `;
+  sidebar.appendChild(vaultGroup);
+
+  // ── Main sections ──────────────────────────────────────────────────────
+  const main = document.querySelector('.main');
+  const footer = main.querySelector('div[style*="margin-top:60px"]');
+
+  // BOLA section
+  const bolaSection = document.createElement('div');
+  bolaSection.className = 'section';
+  bolaSection.id = 'bola';
+  bolaSection.innerHTML = `
+    <div class="section-title"><span class="section-icon">🔓</span> BOLA — Broken Object Level Authorization</div>
+
+    <div style="background:#ef444411;border:1px solid #ef444444;border-radius:8px;padding:14px 18px;margin-bottom:16px;font-size:13px">
+      <strong style="color:#ef4444">OWASP API Security Top 10 — #1</strong><br>
+      <span style="color:var(--dim)">
+        Occurs when an API exposes endpoints that handle object identifiers without
+        verifying that the requesting user has authorization to access that object.
+        Attacker substitutes their object ID with another user's ID and gets their data.
+      </span>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <span class="tag tag-danger">OWASP #1</span>
+        <div>
+          <div class="cmd-name">papister bola &lt;url|file&gt;</div>
+          <div class="cmd-desc">
+            Detects BOLA by mutating object IDs (path, query, body) and analysing responses.
+            Supports sequential, zero/negative, admin ID, type-switching, UUID mutation,
+            enumeration, and cross-account strategies.
+          </div>
+        </div>
+      </div>
+      <div class="cmd-body">
+        <div class="code-block">
+<span class="comment"># Single endpoint — auto-detect all IDs</span>
+<span class="cmd">python cli.py bola</span> <span class="url">https://api.example.com/v1/orders/1042</span>
+
+<span class="comment"># Scan a full collection file</span>
+<span class="cmd">python cli.py bola</span> <span class="url">endpoints/endpoints.yaml</span> <span class="flag">--auth</span> <span class="val">my_bearer</span>
+
+<span class="comment"># Cross-account: user A tries to access user B's objects</span>
+<span class="cmd">python cli.py bola</span> <span class="url">https://api.example.com/v1/users/99/profile</span> <span class="flag">--auth</span> <span class="val">user_a</span> <span class="flag">--alt-auth</span> <span class="val">user_b</span>
+
+<span class="comment"># Enumerate IDs 1-100</span>
+<span class="cmd">python cli.py bola</span> <span class="url">https://api.example.com/v1/invoices/5001</span> <span class="flag">--enum-start 1 --enum-end 100</span>
+
+<span class="comment"># Specific strategies only</span>
+<span class="cmd">python cli.py bola</span> <span class="url">https://api.example.com/v1/items/42</span> <span class="flag">--strategies</span> <span class="val">sequential,admin_ids,zero_neg</span>
+        </div>
+        <table class="flags-table">
+          <tr><th>Flag</th><th>Default</th><th>Description</th></tr>
+          <tr><td class="flag-name">--auth / -a</td><td class="flag-default">None</td><td>Primary auth profile (your token)</td></tr>
+          <tr><td class="flag-name">--alt-auth</td><td class="flag-default">None</td><td>Alt auth profile for cross-account testing</td></tr>
+          <tr><td class="flag-name">--enum-start</td><td class="flag-default">1</td><td>Start of ID enumeration range</td></tr>
+          <tr><td class="flag-name">--enum-end</td><td class="flag-default">20</td><td>End of ID enumeration range</td></tr>
+          <tr><td class="flag-name">--strategies</td><td class="flag-default">all</td><td>sequential · zero_neg · admin_ids · type_switch · uuid_mutate · enumerate</td></tr>
+          <tr><td class="flag-name">--method / -X</td><td class="flag-default">GET</td><td>HTTP method</td></tr>
+          <tr><td class="flag-name">--timeout / -t</td><td class="flag-default">15</td><td>Per-request timeout</td></tr>
+        </table>
+
+        <div style="margin-top:14px;font-size:13px;color:var(--dim)">
+          <strong style="color:var(--text)">Confidence levels:</strong><br>
+          <span style="color:var(--red)">HIGH</span> — 200 returned with meaningful body on mutated ID (likely real object)<br>
+          <span style="color:var(--yellow)">MEDIUM</span> — 200 returned but body size differs significantly from baseline<br>
+          <span style="color:var(--dim)">LOW</span> — Status changed unexpectedly or server errored on mutation
+        </div>
+
+        <div style="margin-top:12px;font-size:13px;color:var(--dim)">
+          <strong style="color:var(--text)">ID locations detected:</strong>
+          path segments <code style="color:var(--cyan)">/users/{id}</code> ·
+          query params <code style="color:var(--cyan)">?user_id=42</code> ·
+          request body <code style="color:var(--cyan)">{"order_id": 5042}</code>
+        </div>
+      </div>
+    </div>
+  `;
+  main.insertBefore(bolaSection, footer);
+
+  // Vault section
+  const vaultSection = document.createElement('div');
+  vaultSection.className = 'section';
+  vaultSection.id = 'vault-set';
+  vaultSection.innerHTML = `
+    <div class="section-title"><span class="section-icon">🔐</span> Vault — Encrypted Key Storage</div>
+
+    <div style="background:#38bdf811;border:1px solid #38bdf844;border-radius:8px;padding:14px 18px;margin-bottom:16px;font-size:13px">
+      <strong style="color:var(--cyan)">Option C security model</strong><br>
+      <span style="color:var(--dim)">
+        Keys encrypted with AES-256-GCM. Two-layer protection:<br>
+        <code style="color:var(--yellow)">vault/.vault.key</code> (keyfile on disk) XOR'd with your passphrase → final encryption key.<br>
+        Keyfile alone = convenient daily use. Keyfile + passphrase = production key protection.<br>
+        Each provider gets its own <code style="color:var(--yellow)">vault/keys/&lt;provider&gt;.enc</code> file.
+        <strong>Add <code>vault/.vault.key</code> to .gitignore — never commit it.</strong>
+      </span>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <div class="cmd-name">papister vault set &lt;provider&gt;</div>
+        <div class="cmd-desc">Interactively prompt and encrypt API keys for a provider. Papister knows exactly what fields each provider needs.</div>
+      </div>
+      <div class="cmd-body">
+        <div class="code-block">
+<span class="cmd">python cli.py vault set mpesa</span>
+<span class="cmd">python cli.py vault set binance</span>
+<span class="cmd">python cli.py vault set stripe</span>
+<span class="cmd">python cli.py vault set africastalking</span>
+<span class="cmd">python cli.py vault set twilio</span>
+<span class="cmd">python cli.py vault set custom</span>      <span class="comment"># freeform — any key/value</span>
+        </div>
+        <table class="flags-table" style="margin-top:12px">
+          <tr><th>Provider</th><th>Fields prompted</th><th>Passphrase option</th></tr>
+          <tr><td class="flag-name">mpesa</td><td>consumer_key · consumer_secret · shortcode · till · passkey</td><td>Yes</td></tr>
+          <tr><td class="flag-name">binance</td><td>api_key · secret_key · testnet · label</td><td>Yes</td></tr>
+          <tr><td class="flag-name">africastalking</td><td>api_key · username · shortcode</td><td>Yes</td></tr>
+          <tr><td class="flag-name">flutterwave</td><td>secret_key · public_key · encryption_key · webhook_secret</td><td>Yes</td></tr>
+          <tr><td class="flag-name">stripe</td><td>secret_key · publishable_key · webhook_secret · account_id</td><td>Yes</td></tr>
+          <tr><td class="flag-name">twilio</td><td>account_sid · auth_token · phone_number</td><td>Yes</td></tr>
+          <tr><td class="flag-name">paypal</td><td>client_id · client_secret · mode</td><td>Yes</td></tr>
+          <tr><td class="flag-name">aws</td><td>access_key_id · secret_access_key · region · session_token</td><td>Yes</td></tr>
+          <tr><td class="flag-name">github</td><td>token · username · webhook_secret</td><td>Yes</td></tr>
+          <tr><td class="flag-name">sendgrid</td><td>api_key · from_email · from_name</td><td>Yes</td></tr>
+          <tr><td class="flag-name">till</td><td>till_number · store_number · alias</td><td>Yes</td></tr>
+          <tr><td class="flag-name">custom</td><td>name · value · label (freeform)</td><td>Yes</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="cmd-card" id="vault-list">
+      <div class="cmd-header">
+        <div class="cmd-name">papister vault list</div>
+        <div class="cmd-desc">List all providers in the vault with their field names, passphrase requirement, and last-updated date. Values are never shown.</div>
+      </div>
+      <div class="cmd-body">
+        <div class="code-block"><span class="cmd">python cli.py vault list</span></div>
+      </div>
+    </div>
+
+    <div class="cmd-card" id="vault-rotate">
+      <div class="cmd-header">
+        <div class="cmd-name">papister vault rotate &lt;provider&gt;</div>
+        <div class="cmd-desc">Re-prompt all fields for a provider. Press Enter to keep current value, type a new value to update. Re-encrypts on save.</div>
+      </div>
+      <div class="cmd-body">
+        <div class="code-block">
+<span class="cmd">python cli.py vault rotate mpesa</span>
+<span class="cmd">python cli.py vault rotate binance</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cmd-card" id="vault-providers">
+      <div class="cmd-header">
+        <div class="cmd-name">papister vault providers</div>
+        <div class="cmd-desc">List all supported provider schemas with their required and optional fields.</div>
+      </div>
+      <div class="cmd-body">
+        <div class="code-block"><span class="cmd">python cli.py vault providers</span></div>
+      </div>
+    </div>
+
+    <div class="cmd-card">
+      <div class="cmd-header">
+        <div class="cmd-name">papister vault delete &lt;provider&gt;</div>
+        <div class="cmd-desc">Permanently delete all keys for a provider. Requires confirmation.</div>
+      </div>
+      <div class="cmd-body">
+        <div class="code-block"><span class="cmd">python cli.py vault delete binance</span></div>
+      </div>
+    </div>
+
+    <div style="background:#0d1117;border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin-top:8px;font-size:13px">
+      <strong style="color:var(--yellow)">⚠ Important — always add to .gitignore:</strong>
+      <div class="code-block" style="margin-top:8px">
+vault/.vault.key
+vault/.vault.salt
+vault/keys/
+      </div>
+    </div>
+  `;
+  main.insertBefore(vaultSection, footer);
+});
+</script>

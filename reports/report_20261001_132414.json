@@ -1,0 +1,29 @@
+{
+  "papister_version": "1.0.1",
+  "generated_at": "2026-10-01T13:24:14.255172",
+  "meta": {
+    "run_id": 1,
+    "mode": "S",
+    "command": "test https://gamesaka.com/api/v1/files/upload"
+  },
+  "summary": {
+    "total": 1,
+    "by_category": {
+      "ok": 1
+    }
+  },
+  "results": [
+    {
+      "url": "https://gamesaka.com/api/v1/files/upload",
+      "method": "GET",
+      "status_code": 200,
+      "response_ms": 1444.56,
+      "category": "ok",
+      "detail": {
+        "status_code": 200
+      },
+      "redirects": [],
+      "error": null
+    }
+  ]
+}

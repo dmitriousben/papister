@@ -1,0 +1,7 @@
+title: Papister
+description: Local API security and testing toolkit
+theme: null
+plugins: []
+exclude:
+  - README.md
+  - "*.sh"

@@ -1,0 +1,51 @@
+# config/settings.yaml — Papister global defaults
+# ─────────────────────────────────────────────────
+# All values here are overridable via CLI flags.
+
+runner:
+  timeout:    15          # seconds per request
+  retries:    2           # retries on 5xx before giving up
+  verify_ssl: true        # set false only for local dev certs
+  user_agent: "Papister/0.1.0 (API Security Tester)"
+
+proxy:
+  enabled: false
+  host:    "127.0.0.1"
+  port:    8787
+
+scan:
+  default_mode: S         # S=sandbox  P=production
+  follow_redirects: true
+  max_redirects:    5
+
+reports:
+  format: both            # json | html | both
+  open_after_scan: false  # auto-open HTML report in browser
+
+security:
+  sqli_level:  2          # 1=error-based  2=+blind  3=+time-based+stacked
+  fuzz_depth:  medium     # low | medium | high
+  cve_auto_check: true    # cross-check fingerprints against CVE DB
+
+cve:
+  auto_update_days: 7     # re-pull NVD feed if older than N days
+  severity_filter:  all   # all | critical | high | medium
+
+integrations:
+  mpesa:
+    sandbox_base:    "https://sandbox.safaricom.co.ke"
+    production_base: "https://api.safaricom.co.ke"
+
+  africastalking:
+    sandbox_base:    "https://api.sandbox.africastalking.com"
+    production_base: "https://api.africastalking.com"
+
+  flutterwave:
+    sandbox_base:    "https://api.flutterwave.com/v3"
+    production_base: "https://api.flutterwave.com/v3"
+
+  stripe:
+    base: "https://api.stripe.com/v1"
+
+  twilio:
+    base: "https://api.twilio.com/2010-04-01"

@@ -1,0 +1,1534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Papister — API Security Testing Toolkit</title>
+<meta name="description" content="Local API security and testing toolkit. Scan, fuzz, exploit BOLA, SQLi, JWT, GraphQL, SOAP — all from your terminal.">
+<meta property="og:title" content="Papister — API Security Testing Toolkit">
+<meta property="og:description" content="Local API security testing. BOLA, SQLi, JWT, GraphQL, SOAP, browser capture — from the terminal.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦈</text></svg>">
+<style>
+:root {
+  --bg:       #0d1117;
+  --bg2:      #010409;
+  --surface:  #161b22;
+  --surface2: #1c2128;
+  --border:   #30363d;
+  --border2:  #21262d;
+  --cyan:     #38bdf8;
+  --cyan-dim: #0ea5e940;
+  --green:    #22c55e;
+  --yellow:   #eab308;
+  --red:      #ef4444;
+  --purple:   #a78bfa;
+  --orange:   #f97316;
+  --dim:      #6e7681;
+  --text:     #c9d1d9;
+  --white:    #f0f6fc;
+  --mono:     'Cascadia Code','Fira Code','JetBrains Mono',ui-monospace,monospace;
+}
+
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+a { color: var(--cyan); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code, pre {
+  font-family: var(--mono);
+}
+
+.mono { font-family: var(--mono); }
+
+/* ── Layout ── */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+section { padding: 96px 0; }
+
+/* ── Nav ── */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(13,17,23,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border2);
+  padding: 0 24px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+}
+.nav-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--white);
+  letter-spacing: 0.02em;
+}
+.nav-logo .shark { font-size: 20px; }
+.nav-badge {
+  font-family: var(--mono);
+  font-size: 11px;
+  background: var(--cyan-dim);
+  color: var(--cyan);
+  border: 1px solid #38bdf830;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  list-style: none;
+}
+.nav-links a {
+  color: var(--dim);
+  font-size: 14px;
+  transition: color .15s;
+}
+.nav-links a:hover { color: var(--white); text-decoration: none; }
+.nav-links .github-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  transition: border-color .15s, color .15s;
+}
+.nav-links .github-btn:hover {
+  border-color: var(--cyan);
+  color: var(--white);
+  text-decoration: none;
+}
+
+/* ── Hero ── */
+#hero {
+  padding: 80px 0 80px;
+  position: relative;
+  overflow: hidden;
+}
+#hero::before {
+  content: '';
+  position: absolute;
+  top: -200px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(ellipse, #38bdf808 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: center;
+}
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--cyan);
+  border: 1px solid #38bdf830;
+  background: var(--cyan-dim);
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 24px;
+  letter-spacing: 0.08em;
+}
+.hero-eyebrow::before {
+  content: '';
+  width: 6px; height: 6px;
+  background: var(--cyan);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity: 1; }
+  50%      { opacity: 0.3; }
+}
+.hero-title {
+  font-size: clamp(36px, 4vw, 54px);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--white);
+  letter-spacing: -0.02em;
+  margin-bottom: 20px;
+}
+.hero-title .accent { color: var(--cyan); }
+.hero-subtitle {
+  font-size: 17px;
+  color: var(--dim);
+  line-height: 1.7;
+  margin-bottom: 36px;
+  max-width: 460px;
+}
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: 7px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+  text-decoration: none;
+}
+.btn:hover { text-decoration: none; }
+.btn-primary {
+  background: var(--cyan);
+  color: #0d1117;
+  border: 1px solid var(--cyan);
+}
+.btn-primary:hover { background: #7dd3fc; border-color: #7dd3fc; }
+.btn-secondary {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover { border-color: var(--dim); color: var(--white); }
+
+.hero-install {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  max-width: 420px;
+}
+.hero-install-label {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--green);
+  padding: 10px 14px;
+  background: var(--surface2);
+  border-right: 1px solid var(--border);
+  white-space: nowrap;
+  user-select: none;
+}
+.hero-install code {
+  font-size: 13px;
+  color: var(--text);
+  padding: 10px 14px;
+  flex: 1;
+}
+.hero-install-copy {
+  background: none;
+  border: none;
+  border-left: 1px solid var(--border);
+  color: var(--dim);
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: color .15s;
+}
+.hero-install-copy:hover { color: var(--cyan); }
+
+.hero-terminal {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  font-family: var(--mono);
+  font-size: 13px;
+}
+.term-bar {
+  background: var(--surface);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.term-dots { display: flex; gap: 6px; }
+.term-dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+}
+.term-dot.red    { background: #ff5f57; }
+.term-dot.yellow { background: #ffbd2e; }
+.term-dot.green  { background: #28ca41; }
+.term-title {
+  flex: 1;
+  text-align: center;
+  font-size: 12px;
+  color: var(--dim);
+}
+.term-body {
+  padding: 20px;
+  line-height: 1.8;
+}
+.term-body .prompt { color: var(--green); }
+.term-body .cmd    { color: var(--white); }
+.term-body .url    { color: var(--cyan); }
+.term-body .flag   { color: var(--yellow); }
+.term-body .out    { color: var(--dim); font-size: 12px; }
+.term-body .found  { color: var(--red); font-weight: 700; }
+.term-body .ok     { color: var(--green); }
+.term-body .info   { color: var(--purple); }
+
+/* ── Section labels ── */
+.section-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--cyan);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.section-title {
+  font-size: clamp(26px, 3vw, 38px);
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 16px;
+}
+.section-sub {
+  font-size: 16px;
+  color: var(--dim);
+  max-width: 560px;
+  line-height: 1.7;
+}
+.section-header { margin-bottom: 56px; }
+
+/* ── Feature cards ── */
+#features { background: var(--bg); }
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.feat-card {
+  background: var(--surface);
+  padding: 32px 28px;
+  position: relative;
+}
+.feat-card:hover { background: var(--surface2); }
+.feat-icon {
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  margin-bottom: 20px;
+}
+.feat-icon.cyan   { background: #38bdf815; border: 1px solid #38bdf825; }
+.feat-icon.green  { background: #22c55e15; border: 1px solid #22c55e25; }
+.feat-icon.purple { background: #a78bfa15; border: 1px solid #a78bfa25; }
+.feat-icon.yellow { background: #eab30815; border: 1px solid #eab30825; }
+.feat-icon.red    { background: #ef444415; border: 1px solid #ef444425; }
+.feat-icon.orange { background: #f9731615; border: 1px solid #f9731625; }
+.feat-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 10px;
+}
+.feat-desc {
+  font-size: 14px;
+  color: var(--dim);
+  line-height: 1.65;
+}
+.feat-tags {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid;
+}
+.tag-cyan   { color: var(--cyan);   background: #38bdf810; border-color: #38bdf830; }
+.tag-green  { color: var(--green);  background: #22c55e10; border-color: #22c55e30; }
+.tag-red    { color: var(--red);    background: #ef444410; border-color: #ef444430; }
+.tag-yellow { color: var(--yellow); background: #eab30810; border-color: #eab30830; }
+.tag-purple { color: var(--purple); background: #a78bfa10; border-color: #a78bfa30; }
+.tag-orange { color: var(--orange); background: #f9731610; border-color: #f9731630; }
+
+/* ── Commands section ── */
+#commands { background: var(--bg2); border-top: 1px solid var(--border2); border-bottom: 1px solid var(--border2); }
+.tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 32px;
+  overflow-x: auto;
+}
+.tab {
+  padding: 12px 20px;
+  font-size: 14px;
+  color: var(--dim);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  white-space: nowrap;
+  transition: color .15s;
+  user-select: none;
+}
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.cmd-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
+}
+.cmd-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: border-color .15s;
+}
+.cmd-card:hover { border-color: #30363d; }
+.cmd-top {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border2);
+}
+.cmd-name {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--cyan);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.cmd-desc-text {
+  font-size: 13px;
+  color: var(--dim);
+  line-height: 1.5;
+}
+.cmd-examples {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.cmd-ex {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text);
+  line-height: 1.6;
+}
+.cmd-ex .kw  { color: var(--green); }
+.cmd-ex .arg { color: var(--cyan); }
+.cmd-ex .fl  { color: var(--yellow); }
+.cmd-ex .vl  { color: var(--purple); }
+
+/* ── Attack modules ── */
+#attacks { background: var(--bg); }
+.attacks-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 48px;
+}
+.attack-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  transition: border-color .15s, background .15s;
+  cursor: default;
+}
+.attack-card:hover {
+  background: var(--surface2);
+  border-color: #38bdf830;
+}
+.attack-num {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--dim);
+  margin-bottom: 8px;
+}
+.attack-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 6px;
+}
+.attack-sub {
+  font-size: 12px;
+  color: var(--dim);
+  line-height: 1.55;
+}
+.attack-badge {
+  display: inline-block;
+  margin-top: 10px;
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+.ab-owasp  { background: #ef444415; color: var(--red);    border: 1px solid #ef444430; }
+.ab-deep   { background: #a78bfa15; color: var(--purple); border: 1px solid #a78bfa30; }
+.ab-live   { background: #22c55e15; color: var(--green);  border: 1px solid #22c55e30; }
+.ab-crypto { background: #eab30815; color: var(--yellow); border: 1px solid #eab30830; }
+
+/* ── Browser mode highlight ── */
+#browser-mode {
+  background: var(--bg2);
+  border-top: 1px solid var(--border2);
+  border-bottom: 1px solid var(--border2);
+}
+.bm-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: start;
+}
+.bm-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.bm-step {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+.bm-step-num {
+  width: 32px; height: 32px;
+  background: var(--cyan-dim);
+  border: 1px solid #38bdf830;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--cyan);
+  flex-shrink: 0;
+}
+.bm-step-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 4px;
+  margin-top: 4px;
+}
+.bm-step-desc {
+  font-size: 14px;
+  color: var(--dim);
+  line-height: 1.6;
+}
+
+.menu-preview {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  font-family: var(--mono);
+  font-size: 13px;
+}
+.menu-bar {
+  background: var(--surface);
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--dim);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.menu-dot { width: 8px; height: 8px; border-radius: 50%; }
+.menu-body { padding: 18px 20px; }
+.menu-title {
+  color: var(--cyan);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.menu-auth {
+  font-size: 11px;
+  color: var(--green);
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border2);
+}
+.menu-item {
+  display: flex;
+  gap: 12px;
+  padding: 5px 0;
+  line-height: 1.4;
+}
+.menu-key  { color: var(--cyan); min-width: 18px; }
+.menu-label { color: var(--text); font-size: 12px; }
+.menu-label span { color: var(--dim); }
+
+/* ── Install ── */
+#install { background: var(--bg); }
+.install-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+}
+.install-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.install-step {
+  display: flex;
+  gap: 20px;
+  padding-bottom: 28px;
+  position: relative;
+}
+.install-step:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 32px;
+  bottom: 0;
+  width: 1px;
+  background: var(--border);
+}
+.step-num {
+  width: 32px; height: 32px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--cyan);
+  flex-shrink: 0;
+  z-index: 1;
+}
+.step-body { flex: 1; padding-top: 4px; }
+.step-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 8px;
+}
+.step-code {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text);
+  line-height: 1.7;
+  position: relative;
+}
+.step-code .comment { color: var(--dim); }
+.step-code .g { color: var(--green); }
+.step-code .c { color: var(--cyan); }
+.copy-btn {
+  position: absolute;
+  top: 8px; right: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--dim);
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  font-family: var(--mono);
+  transition: all .15s;
+}
+.copy-btn:hover { color: var(--cyan); border-color: var(--cyan); }
+
+.req-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.req-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.req-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.req-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 2px;
+}
+.req-ver {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--dim);
+}
+
+/* ── Stats bar ── */
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 72px;
+}
+.stat-cell {
+  background: var(--surface);
+  padding: 28px 24px;
+  text-align: center;
+}
+.stat-num {
+  font-family: var(--mono);
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 6px;
+  line-height: 1;
+}
+.stat-num .accent { color: var(--cyan); }
+.stat-label {
+  font-size: 13px;
+  color: var(--dim);
+}
+
+/* ── Footer ── */
+footer {
+  background: var(--bg2);
+  border-top: 1px solid var(--border2);
+  padding: 48px 0 36px;
+}
+.footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.footer-left {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.footer-logo {
+  font-family: var(--mono);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.footer-meta {
+  font-size: 13px;
+  color: var(--dim);
+}
+.footer-links {
+  display: flex;
+  gap: 24px;
+  list-style: none;
+}
+.footer-links a {
+  color: var(--dim);
+  font-size: 14px;
+  transition: color .15s;
+}
+.footer-links a:hover { color: var(--white); text-decoration: none; }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .hero-grid     { grid-template-columns: 1fr; }
+  .features-grid { grid-template-columns: 1fr 1fr; }
+  .attacks-grid  { grid-template-columns: repeat(2, 1fr); }
+  .bm-grid       { grid-template-columns: 1fr; }
+  .install-grid  { grid-template-columns: 1fr; }
+  .stats-bar     { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .features-grid { grid-template-columns: 1fr; }
+  .attacks-grid  { grid-template-columns: 1fr 1fr; }
+  .stats-bar     { grid-template-columns: 1fr 1fr; }
+  .nav-links li:not(:last-child) { display: none; }
+  section { padding: 64px 0; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ═════════════════════════════════════════════════════════════════ -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">
+      <span class="shark">🦈</span>
+      <span>Papister</span>
+      <span class="nav-badge">v1.0.1</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#attacks">Attacks</a></li>
+      <li><a href="#browser-mode">Browser Mode</a></li>
+      <li><a href="#install">Install</a></li>
+      <li>
+        <a href="https://github.com/YOUR_USERNAME/papister" class="github-btn" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+          GitHub
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ══ HERO ════════════════════════════════════════════════════════════════ -->
+<section id="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <div class="hero-eyebrow">LOCAL · CLI FIRST · OFFLINE</div>
+        <h1 class="hero-title">
+          API security testing<br>
+          from your <span class="accent">terminal</span>
+        </h1>
+        <p class="hero-subtitle">
+          Scan endpoints, exploit BOLA, inject SQLi, fuzz params, attack JWT tokens,
+          test GraphQL and SOAP — all from one tool, all local, no accounts required.
+        </p>
+        <div class="hero-actions">
+          <a href="#install" class="btn btn-primary">Get started</a>
+          <a href="commands.html" class="btn btn-secondary">View all commands</a>
+        </div>
+        <div class="hero-install">
+          <span class="hero-install-label">$</span>
+          <code id="install-cmd">git clone https://github.com/YOUR_USERNAME/papister</code>
+          <button class="hero-install-copy" onclick="copyInstall()" title="Copy">⎘</button>
+        </div>
+      </div>
+
+      <div class="hero-terminal">
+        <div class="term-bar">
+          <div class="term-dots">
+            <div class="term-dot red"></div>
+            <div class="term-dot yellow"></div>
+            <div class="term-dot green"></div>
+          </div>
+          <span class="term-title">papister — bash</span>
+        </div>
+        <div class="term-body">
+          <div><span class="prompt">$</span> <span class="cmd">python cli.py browser</span> <span class="url">https://api.target.com</span> <span class="flag">--name "recon"</span></div>
+          <div class="out" style="margin:4px 0 0 12px">Launching browser → /usr/bin/chromium</div>
+          <div class="out" style="margin:0 0 8px 12px">Session ID → 7  |  Proxy → 127.0.0.1:8787</div>
+          <div class="out">── Live Traffic ─────────────────────────────────</div>
+          <div style="margin:4px 0"><span class="ok">GET </span> <span class="url">/api/v2/users/1042</span> <span class="found">[BOLA]</span></div>
+          <div style="margin:4px 0"><span class="ok">POST</span> <span class="url">/api/v2/orders</span> <span class="info">[TOKEN]</span></div>
+          <div style="margin:4px 0"><span class="ok">GET </span> <span class="url">/api/v2/users/1043</span> <span class="found">[BOLA][NEW]</span></div>
+          <div class="out" style="margin:8px 0">── Session complete ─────────────────────────────</div>
+          <div class="out">Endpoints: 14  BOLA: 6  Tokens: 2</div>
+          <div style="margin:8px 0"><span class="info">⚔  Attack menu</span> <span class="out">→ Auth: ACTIVE</span></div>
+          <div class="out">[1] BOLA  [2] SQLi  [3] Fuzz  [4] JWT ...</div>
+          <div style="margin-top:8px"><span class="prompt">→</span> <span class="cmd">1</span><span class="found" style="margin-left:16px">BOLA: HIGH confidence on /users/1043 ✓</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-cell">
+        <div class="stat-num"><span class="accent">12</span></div>
+        <div class="stat-label">attack modules</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-num"><span class="accent">5</span></div>
+        <div class="stat-label">auth types</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-num"><span class="accent">12</span></div>
+        <div class="stat-label">vault providers</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-num"><span class="accent">0</span></div>
+        <div class="stat-label">external accounts</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FEATURES ═════════════════════════════════════════════════════════════ -->
+<section id="features">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">What it does</div>
+      <h2 class="section-title">Everything you need in one place</h2>
+      <p class="section-sub">No cloud, no accounts, no data leaving your machine. One CLI, every attack surface.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-icon red">🔓</div>
+        <div class="feat-title">BOLA / IDOR</div>
+        <div class="feat-desc">Detect broken object level authorization — the #1 API vulnerability. Mutates IDs in path, query, and body. Sequential, UUID, cross-account, admin ID strategies.</div>
+        <div class="feat-tags">
+          <span class="tag tag-red">OWASP #1</span>
+          <span class="tag tag-cyan">6 strategies</span>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon purple">💉</div>
+        <div class="feat-title">SQL injection</div>
+        <div class="feat-desc">Deep SQLi across four techniques: error-based, boolean-blind, time-based, and stacked queries. Level 1–3 lets you control depth.</div>
+        <div class="feat-tags">
+          <span class="tag tag-purple">error</span>
+          <span class="tag tag-purple">blind</span>
+          <span class="tag tag-purple">time-based</span>
+          <span class="tag tag-purple">stacked</span>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon cyan">🌐</div>
+        <div class="feat-title">Browser mode</div>
+        <div class="feat-desc">Launch Chromium through Papister's proxy, capture all API traffic live, auto-extract tokens and cookies, then fire any attack — no copy-pasting, no switching tools.</div>
+        <div class="feat-tags">
+          <span class="tag tag-cyan">session capture</span>
+          <span class="tag tag-green">auto auth</span>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon yellow">🔑</div>
+        <div class="feat-title">JWT attacks</div>
+        <div class="feat-desc">alg:none bypass, claim tampering, kid injection, secret brute-force. Works on any endpoint that accepts Bearer tokens.</div>
+        <div class="feat-tags">
+          <span class="tag tag-yellow">alg:none</span>
+          <span class="tag tag-yellow">kid inject</span>
+          <span class="tag tag-yellow">brute-force</span>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon orange">📡</div>
+        <div class="feat-title">GraphQL & SOAP</div>
+        <div class="feat-desc">GraphQL introspection, batching attacks, deep nesting, alias abuse. SOAP WSDL discovery, XXE injection, SOAPAction spoofing.</div>
+        <div class="feat-tags">
+          <span class="tag tag-orange">introspect</span>
+          <span class="tag tag-orange">XXE</span>
+          <span class="tag tag-orange">batching</span>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon green">🔐</div>
+        <div class="feat-title">Encrypted vault</div>
+        <div class="feat-desc">AES-256-GCM key storage. 12 provider schemas — Mpesa, Stripe, Binance, AWS, and more. Keyfile + passphrase two-layer protection. Nothing leaves your machine.</div>
+        <div class="feat-tags">
+          <span class="tag tag-green">AES-256-GCM</span>
+          <span class="tag tag-green">12 providers</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ COMMANDS ══════════════════════════════════════════════════════════════ -->
+<section id="commands">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Commands</div>
+      <h2 class="section-title">Everything runs from one CLI</h2>
+      <p class="section-sub">Thin Typer entry point. Every command delegates cleanly to its module.</p>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('core',this)">Core</div>
+      <div class="tab" onclick="switchTab('security',this)">Security</div>
+      <div class="tab" onclick="switchTab('browser',this)">Browser</div>
+      <div class="tab" onclick="switchTab('auth',this)">Auth &amp; Vault</div>
+      <div class="tab" onclick="switchTab('proxy',this)">Proxy</div>
+    </div>
+
+    <div id="tab-core" class="tab-content active">
+      <div class="cmd-grid">
+        <div class="cmd-card">
+          <div class="cmd-top">
+            <div class="cmd-name">papister scan &lt;file&gt;</div>
+            <div class="cmd-desc-text">Scan all endpoints from a collection file. Prints live results and writes JSON + HTML reports.</div>
+          </div>
+          <div class="cmd-examples">
+            <div class="cmd-ex"><span class="kw">python cli.py scan</span> <span class="arg">endpoints.yaml</span></div>
+            <div class="cmd-ex"><span class="kw">python cli.py scan</span> <span class="arg">endpoints.txt</span> <span class="fl">--mode P</span></div>
+          </div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-top">
+            <div class="cmd-name">papister test &lt;url&gt;</div>
+            <div class="cmd-desc-text">Test a single endpoint. Shows full result inline with status, headers, and timing.</div>
+          </div>
+          <div class="cmd-examples">
+            <div class="cmd-ex"><span class="kw">python cli.py test</span> <span class="arg">https://api.example.com/v1/users</span></div>
+            <div class="cmd-ex"><span class="kw">python cli.py test</span> <span class="arg">https://api.example.com/login</span> <span class="fl">--method POST</span></div>
+          </div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-top">
+            <div class="cmd-name">papister fingerprint &lt;url&gt;</div>
+            <div class="cmd-desc-text">Detect backend stack — web server, framework, language, cloud provider. Cross-refs against local CVE DB.</div>
+          </div>
+          <div class="cmd-examples">
+            <div class="cmd-ex"><span class="kw">python cli.py fingerprint</span> <span class="arg">https://api.example.com</span></div>
+          </div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-top">
+            <div class="cmd-name">papister headers &lt;url&gt;</div>
+            <div class="cmd-desc-text">Audit security headers — HSTS, CSP, CORS, X-Frame-Options. Returns a security score 0–100.</div>
+          </div>
+          <div class="cmd-examples">
+            <div class="cmd-ex"><span class="kw">python cli.py headers</span> <span class="arg">https://api.example.com</span></div>
+          </div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-top">
+            <div class="cmd-name">papister report [timestamp]</div>
+            <div class="cmd-desc-text">Open an HTML report in the browser. No argument opens the latest report.</div>
+          </div>
+          <div class="cmd-examples">
+            <div class="cmd-ex"><span class="kw">python cli.py report</span></div>
+            <div class="cmd-ex"><span class="kw">python cli.py report</span> <span class="vl">20240601_143022</span></div>
+          </div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-top">
+            <div class="cmd-name">papister cve update / check</div>
+            <div class="cmd-desc-text">Pull the latest NVD CVE feed, or check a specific technology and version against the local DB.</div>
+          </div>
+          <div class="cmd-examples">
+            <div class="cmd-ex"><span class="kw">python cli.py cve update</span></div>
+            <div class="cmd-ex"><span class="kw">python cli.py cve check</span> <span class="vl">nginx 1.18.0</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-security" class="tab-content">
+      <div class="cmd-grid">
+        <div class="cmd-card">
+          <div class="cmd-top">
+            <div class="cmd-name">papister bola &lt;url|file&gt;</div>
+            <div class="cmd-desc-text">Detect BOLA via ID mutation. Sequential, zero/neg, admin IDs, type-switch, UUID, enumeration, cross-account.</div>
+          </div>
+          <div class="cmd-examples">
+            <div class="cmd-ex"><span class="kw">python cli.py bola</span> <span class="arg">https://api.example.com/v1/orders/1042</span></div>
+            <div class="cmd-ex"><span class="kw">python cli.py bola</span> <span class="arg">https://...</span> <span class="fl">--auth</span> <span class="vl">user_a</span> <span class="fl">--alt-auth</span> <span class="vl">user_b</span></div>
+            <div class="cmd-ex"><span class="kw">python cli.py bola</span> <span class="arg">https://...</span> <span class="fl">--enum-start 1 --enum-end 100</span></div>
+          </div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-top">
+            <div class="cmd-name">papister sqli &lt;url|file&gt;</div>
+            <div class="cmd-desc-text">Deep SQL injection: error-based, boolean-blind, time-based, stacked queries. Level 1–3.</div>
+          </div>
+          <div class="cmd-examples">
+            <div class="cmd-ex"><span class="kw">python cli.py sqli</span> <span class="arg">https://api.example.com/search?q=test</span> <span class="fl">--level 3</span></div>
+          </div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-top">
+            <div class="cmd-name">papister jwt &lt;token&gt;</div>
+            <div class="cmd-desc-text">JWT attack suite: alg:none, claim tampering, kid injection, secret brute-force.</div>
+          </div>
+          <div class="cmd-examples">
+            <div class="cmd-ex"><span class="kw">python cli.py jwt</span> <span class="vl">eyJ...</span> <span class="fl">--attack --url</span> <span class="arg">https://api.example.com</span></div>
+          </div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-top">
+            <div class="cmd-name">papister graphql &lt;url&gt;</div>
+            <div class="cmd-desc-text">GraphQL introspection, batching, deep nesting attacks, alias abuse.</div>
+          </div>
+          <div class="cmd-examples">
+            <div class="cmd-ex"><span class="kw">python cli.py graphql</span> <span class="arg">https://api.example.com/graphql</span> <span class="fl">--attack</span></div>
+          </div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-top">
+            <div class="cmd-name">papister soap &lt;url&gt;</div>
+            <div class="cmd-desc-text">SOAP WSDL discovery, XXE injection, SOAPAction spoofing.</div>
+          </div>
+          <div class="cmd-examples">
+            <div class="cmd-ex"><span class="kw">python cli.py soap</span> <span class="arg">https://api.example.com/service.wsdl</span> <span class="fl">--attack</span></div>
+          </div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-top">
+            <div class="cmd-name">papister fuzz &lt;url&gt;</div>
+            <div class="cmd-desc-text">Fuzz params with nulls, oversized strings, type confusion, path traversal, template injection.</div>
+          </div>
+          <div class="cmd-examples">
+            <div class="cmd-ex"><span class="kw">python cli.py fuzz</span> <span class="arg">https://api.example.com/v1/users?id=1</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-browser" class="tab-content">
+      <div class="cmd-grid">
+        <div class="cmd-card">
+          <div class="cmd-top">
+            <div class="cmd-name">papister browser &lt;url&gt;</div>
+            <div class="cmd-desc-text">Launch browser through Papister's proxy. Captures all API traffic, extracts auth, classifies endpoints, drops into attack menu.</div>
+          </div>
+          <div class="cmd-examples">
+            <div class="cmd-ex"><span class="kw">python cli.py browser</span> <span class="arg">https://target.com</span></div>
+            <div class="cmd-ex"><span class="kw">python cli.py browser</span> <span class="arg">https://target.com</span> <span class="fl">--name</span> <span class="vl">"admin panel"</span></div>
+            <div class="cmd-ex"><span class="kw">python cli.py browser</span> <span class="arg">https://target.com</span> <span class="fl">--auto-bola</span></div>
+            <div class="cmd-ex"><span class="kw">python cli.py browser</span> <span class="arg">https://target.com</span> <span class="fl">--profile-dir</span> <span class="vl">/tmp/session</span></div>
+          </div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-top">
+            <div class="cmd-name">papister sessions</div>
+            <div class="cmd-desc-text">List all past browser sessions. Shows ID, label, host, timestamps, endpoint and token counts.</div>
+          </div>
+          <div class="cmd-examples">
+            <div class="cmd-ex"><span class="kw">python cli.py sessions</span></div>
+            <div class="cmd-ex"><span class="kw">python cli.py sessions</span> <span class="fl">--limit 50</span></div>
+          </div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-top">
+            <div class="cmd-name">papister sessions-resume &lt;id&gt;</div>
+            <div class="cmd-desc-text">Reload a past session's auth context and endpoint list. Opens the attack menu without re-opening the browser.</div>
+          </div>
+          <div class="cmd-examples">
+            <div class="cmd-ex"><span class="kw">python cli.py sessions-resume</span> <span class="vl">3</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-auth" class="tab-content">
+      <div class="cmd-grid">
+        <div class="cmd-card">
+          <div class="cmd-top">
+            <div class="cmd-name">papister auth set &lt;name&gt;</div>
+            <div class="cmd-desc-text">Configure and save an auth profile. Supports apikey, oauth1, oauth2, basic, custom headers.</div>
+          </div>
+          <div class="cmd-examples">
+            <div class="cmd-ex"><span class="kw">python cli.py auth set</span> <span class="vl">my_bearer</span> <span class="fl">--type oauth2</span></div>
+            <div class="cmd-ex"><span class="kw">python cli.py auth set</span> <span class="vl">mpesa_key</span> <span class="fl">--type oauth1</span></div>
+          </div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-top">
+            <div class="cmd-name">papister vault set &lt;provider&gt;</div>
+            <div class="cmd-desc-text">Encrypt API keys with AES-256-GCM. 12 provider schemas: Mpesa, Stripe, Binance, AWS, GitHub and more.</div>
+          </div>
+          <div class="cmd-examples">
+            <div class="cmd-ex"><span class="kw">python cli.py vault set</span> <span class="vl">mpesa</span></div>
+            <div class="cmd-ex"><span class="kw">python cli.py vault set</span> <span class="vl">stripe</span></div>
+            <div class="cmd-ex"><span class="kw">python cli.py vault rotate</span> <span class="vl">binance</span></div>
+          </div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-top">
+            <div class="cmd-name">papister integrations run &lt;name&gt;</div>
+            <div class="cmd-desc-text">Full integration test suites for Mpesa, Africa's Talking, Flutterwave, Stripe, Twilio.</div>
+          </div>
+          <div class="cmd-examples">
+            <div class="cmd-ex"><span class="kw">python cli.py integrations run</span> <span class="vl">mpesa</span> <span class="fl">--mode S</span></div>
+            <div class="cmd-ex"><span class="kw">python cli.py integrations run</span> <span class="vl">stripe</span> <span class="fl">--mode S</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-proxy" class="tab-content">
+      <div class="cmd-grid">
+        <div class="cmd-card">
+          <div class="cmd-top">
+            <div class="cmd-name">papister proxy start</div>
+            <div class="cmd-desc-text">Start the built-in intercept proxy on 127.0.0.1:8787. All requests are logged to SQLite for replay.</div>
+          </div>
+          <div class="cmd-examples">
+            <div class="cmd-ex"><span class="kw">python cli.py proxy start</span></div>
+            <div class="cmd-ex"><span class="kw">python cli.py proxy start</span> <span class="fl">--port 9090</span></div>
+          </div>
+        </div>
+        <div class="cmd-card">
+          <div class="cmd-top">
+            <div class="cmd-name">papister proxy replay &lt;id&gt;</div>
+            <div class="cmd-desc-text">Replay a previously captured request by its ID. Modify headers or body before replaying.</div>
+          </div>
+          <div class="cmd-examples">
+            <div class="cmd-ex"><span class="kw">python cli.py proxy replay</span> <span class="vl">a1b2c3d4</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ ATTACK MODULES ════════════════════════════════════════════════════════ -->
+<section id="attacks">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Attack surface</div>
+      <h2 class="section-title">12 attack modules, one command</h2>
+      <p class="section-sub">Every module fires from the post-browser attack menu with your captured session automatically injected.</p>
+    </div>
+    <div class="attacks-grid">
+      <div class="attack-card">
+        <div class="attack-num">01</div>
+        <div class="attack-name">BOLA / IDOR</div>
+        <div class="attack-sub">ID mutation across 6 strategies. The most common critical API bug.</div>
+        <span class="attack-badge ab-owasp">OWASP #1</span>
+      </div>
+      <div class="attack-card">
+        <div class="attack-num">02</div>
+        <div class="attack-name">SQL injection</div>
+        <div class="attack-sub">Error, blind, time-based, stacked. Level 1–3 depth control.</div>
+        <span class="attack-badge ab-deep">DEEP</span>
+      </div>
+      <div class="attack-card">
+        <div class="attack-num">03</div>
+        <div class="attack-name">Fuzzer</div>
+        <div class="attack-sub">Param chaos — nulls, overflow, type confusion, traversal, SSTI.</div>
+        <span class="attack-badge ab-deep">FUZZ</span>
+      </div>
+      <div class="attack-card">
+        <div class="attack-num">04</div>
+        <div class="attack-name">JWT attacks</div>
+        <div class="attack-sub">alg:none, claim tamper, kid injection, secret brute-force.</div>
+        <span class="attack-badge ab-crypto">CRYPTO</span>
+      </div>
+      <div class="attack-card">
+        <div class="attack-num">05</div>
+        <div class="attack-name">GraphQL</div>
+        <div class="attack-sub">Introspect, batching, deep nesting, alias abuse, field suggestion.</div>
+        <span class="attack-badge ab-deep">DEEP</span>
+      </div>
+      <div class="attack-card">
+        <div class="attack-num">06</div>
+        <div class="attack-name">SOAP / WSDL</div>
+        <div class="attack-sub">WSDL discovery, XXE injection, SOAPAction spoofing.</div>
+        <span class="attack-badge ab-deep">XXE</span>
+      </div>
+      <div class="attack-card">
+        <div class="attack-num">07</div>
+        <div class="attack-name">Headers audit</div>
+        <div class="attack-sub">HSTS, CSP, CORS misconfiguration, X-Frame. Score 0–100.</div>
+        <span class="attack-badge ab-live">AUDIT</span>
+      </div>
+      <div class="attack-card">
+        <div class="attack-num">08</div>
+        <div class="attack-name">Fingerprint + CVE</div>
+        <div class="attack-sub">Stack detect + automatic CVE cross-ref on found versions.</div>
+        <span class="attack-badge ab-live">CVE</span>
+      </div>
+      <div class="attack-card">
+        <div class="attack-num">09</div>
+        <div class="attack-name">Full scan</div>
+        <div class="attack-sub">Orchestrated scan across all captured endpoints with auth.</div>
+        <span class="attack-badge ab-live">SCAN</span>
+      </div>
+      <div class="attack-card">
+        <div class="attack-num">M</div>
+        <div class="attack-name">Mail probe</div>
+        <div class="attack-sub">POP3 / IMAP / SMTP — banners, capabilities, auth methods.</div>
+        <span class="attack-badge ab-live">PROBE</span>
+      </div>
+      <div class="attack-card">
+        <div class="attack-num">R</div>
+        <div class="attack-name">POST replay</div>
+        <div class="attack-sub">Re-fire captured POSTs with 6 body mutations — priv escalation, SQLi, type confusion, null.</div>
+        <span class="attack-badge ab-deep">REPLAY</span>
+      </div>
+      <div class="attack-card" style="border-style:dashed;opacity:.5">
+        <div class="attack-num">A</div>
+        <div class="attack-name">Full pipeline</div>
+        <div class="attack-sub">Run all 11 above in sequence. One command, full coverage.</div>
+        <span class="attack-badge ab-live">ALL</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ BROWSER MODE ══════════════════════════════════════════════════════════ -->
+<section id="browser-mode">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Browser Mode</div>
+      <h2 class="section-title">Browse once. Attack everything.</h2>
+      <p class="section-sub">The full recon-to-exploit pipeline without leaving the terminal.</p>
+    </div>
+    <div class="bm-grid">
+      <div class="bm-steps">
+        <div class="bm-step">
+          <div class="bm-step-num">1</div>
+          <div>
+            <div class="bm-step-title">Launch browser through Papister's proxy</div>
+            <div class="bm-step-desc">Chromium starts pointing to 127.0.0.1:8787. Your mitmproxy on 8081 stays untouched. Dedicated temp profile — won't touch your daily browser.</div>
+          </div>
+        </div>
+        <div class="bm-step">
+          <div class="bm-step-num">2</div>
+          <div>
+            <div class="bm-step-title">Browse and log in normally</div>
+            <div class="bm-step-desc">Every API call — including lazy-loaded SPA routes — is captured in real-time. Live traffic table shows NEW / TOKEN / BOLA / GQL / SOAP tags as they appear.</div>
+          </div>
+        </div>
+        <div class="bm-step">
+          <div class="bm-step-num">3</div>
+          <div>
+            <div class="bm-step-title">Auth captured automatically</div>
+            <div class="bm-step-desc">Authorization headers, X-API-Key, Cookie jar, Set-Cookie responses — all extracted, deduped, and saved to the local DB. No copy-pasting.</div>
+          </div>
+        </div>
+        <div class="bm-step">
+          <div class="bm-step-num">4</div>
+          <div>
+            <div class="bm-step-title">Close browser → attack menu appears</div>
+            <div class="bm-step-desc">Pick any attack. Every module fires with your captured session injected. BOLA, SQLi, JWT, GraphQL, SOAP, POST replay — all as your logged-in user.</div>
+          </div>
+        </div>
+        <div class="bm-step">
+          <div class="bm-step-num">5</div>
+          <div>
+            <div class="bm-step-title">Session saved — resume anytime</div>
+            <div class="bm-step-desc"><code style="font-size:12px;color:var(--cyan)">papister sessions-resume 3</code> reloads auth and endpoints from a past session. Run more attacks without re-opening the browser.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="menu-preview">
+        <div class="menu-bar">
+          <div class="menu-dot" style="background:#ff5f57"></div>
+          <div class="menu-dot" style="background:#ffbd2e"></div>
+          <div class="menu-dot" style="background:#28ca41"></div>
+          <span style="margin-left:8px">papister — attack menu</span>
+        </div>
+        <div class="menu-body">
+          <div class="menu-title">⚔  Papister Attack Menu</div>
+          <div class="menu-auth">✓ Auth: ACTIVE — attacks fire as your session</div>
+          <div class="menu-item"><span class="menu-key">[1]</span><span class="menu-label">BOLA / IDOR <span>— ID mutation, enum, cross-account</span></span></div>
+          <div class="menu-item"><span class="menu-key">[2]</span><span class="menu-label">SQLi <span>— error, blind, time-based, stacked</span></span></div>
+          <div class="menu-item"><span class="menu-key">[3]</span><span class="menu-label">Fuzzer <span>— param chaos on all endpoints</span></span></div>
+          <div class="menu-item"><span class="menu-key">[4]</span><span class="menu-label">JWT attacks <span>— alg:none, claim tamper, kid inject</span></span></div>
+          <div class="menu-item"><span class="menu-key">[5]</span><span class="menu-label">GraphQL <span>— introspect, batch, deep nest</span></span></div>
+          <div class="menu-item"><span class="menu-key">[6]</span><span class="menu-label">SOAP / WSDL <span>— XXE, SOAPAction spoof</span></span></div>
+          <div class="menu-item"><span class="menu-key">[7]</span><span class="menu-label">Headers audit <span>— HSTS, CSP, CORS, X-Frame</span></span></div>
+          <div class="menu-item"><span class="menu-key">[8]</span><span class="menu-label">Fingerprint + CVE <span>— stack + CVE cross-ref</span></span></div>
+          <div class="menu-item"><span class="menu-key">[M]</span><span class="menu-label">Mail probe <span>— POP3/IMAP/SMTP</span></span></div>
+          <div class="menu-item"><span class="menu-key">[R]</span><span class="menu-label">Replay POST bodies <span>— 6 mutations</span></span></div>
+          <div class="menu-item"><span class="menu-key">[A]</span><span class="menu-label">All attacks <span>— full pipeline</span></span></div>
+          <div class="menu-item" style="margin-top:8px;padding-top:8px;border-top:1px solid #21262d">
+            <span class="menu-key" style="color:var(--dim)">[0]</span>
+            <span class="menu-label" style="color:var(--dim)">Exit</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ INSTALL ══════════════════════════════════════════════════════════════ -->
+<section id="install">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-label">Get started</div>
+      <h2 class="section-title">Running in under two minutes</h2>
+      <p class="section-sub">No cloud setup, no API keys to create. Clone and run.</p>
+    </div>
+    <div class="install-grid">
+      <div class="install-steps">
+        <div class="install-step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Clone the repo</div>
+            <div class="step-code">
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+              <span class="g">git</span> clone https://github.com/YOUR_USERNAME/papister<br>
+              <span class="g">cd</span> papister
+            </div>
+          </div>
+        </div>
+        <div class="install-step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Install dependencies</div>
+            <div class="step-code">
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+              pip install -r requirements.txt
+            </div>
+          </div>
+        </div>
+        <div class="install-step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Run the DB migration</div>
+            <div class="step-code">
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+              <span class="c"># sets up all tables including browser session tables</span><br>
+              python storage/db_browser_migration.py
+            </div>
+          </div>
+        </div>
+        <div class="install-step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <div class="step-title">Start the proxy and browse</div>
+            <div class="step-code">
+              <button class="copy-btn" onclick="copyCode(this)">copy</button>
+              python cli.py proxy start <span class="c"># port 8787</span><br>
+              python cli.py browser https://target.com
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label" style="margin-bottom:20px">Requirements</div>
+        <div class="req-list">
+          <div class="req-item">
+            <div class="req-icon">🐍</div>
+            <div>
+              <div class="req-name">Python</div>
+              <div class="req-ver">3.9 or later</div>
+            </div>
+          </div>
+          <div class="req-item">
+            <div class="req-icon">📦</div>
+            <div>
+              <div class="req-name">Typer + Rich</div>
+              <div class="req-ver">CLI framework and terminal output</div>
+            </div>
+          </div>
+          <div class="req-item">
+            <div class="req-icon">🌐</div>
+            <div>
+              <div class="req-name">Chromium / Chrome / Brave</div>
+              <div class="req-ver">For browser mode — auto-detected on PATH</div>
+            </div>
+          </div>
+          <div class="req-item">
+            <div class="req-icon">🗄️</div>
+            <div>
+              <div class="req-name">SQLite</div>
+              <div class="req-ver">Built into Python stdlib — no install needed</div>
+            </div>
+          </div>
+          <div class="req-item">
+            <div class="req-icon">🔒</div>
+            <div>
+              <div class="req-name">cryptography</div>
+              <div class="req-ver">AES-256-GCM for the vault</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══════════════════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-left">
+      <div class="footer-logo">🦈 Papister</div>
+      <div class="footer-meta">v1.0.1 &nbsp;·&nbsp; Local API security toolkit &nbsp;·&nbsp; MIT License</div>
+    </div>
+    <ul class="footer-links">
+      <li><a href="commands.html">Docs</a></li>
+      <li><a href="https://github.com/YOUR_USERNAME/papister" target="_blank" rel="noopener">GitHub</a></li>
+      <li><a href="https://github.com/YOUR_USERNAME/papister/issues" target="_blank" rel="noopener">Issues</a></li>
+      <li><a href="https://github.com/YOUR_USERNAME/papister/blob/main/LICENSE" target="_blank" rel="noopener">License</a></li>
+    </ul>
+  </div>
+</footer>
+
+<script>
+function switchTab(id, el) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  el.classList.add('active');
+}
+
+function copyInstall() {
+  const text = document.getElementById('install-cmd').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.hero-install-copy');
+    const orig = btn.textContent;
+    btn.textContent = '✓';
+    btn.style.color = 'var(--green)';
+    setTimeout(() => { btn.textContent = orig; btn.style.color = ''; }, 1500);
+  });
+}
+
+function copyCode(btn) {
+  const block = btn.parentElement;
+  const text = block.innerText.replace('copy\n','').replace('copy','').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✓';
+    btn.style.color = 'var(--green)';
+    btn.style.borderColor = 'var(--green)';
+    setTimeout(() => {
+      btn.textContent = orig;
+      btn.style.color = '';
+      btn.style.borderColor = '';
+    }, 1500);
+  });
+}
+</script>
+</body>
+</html>

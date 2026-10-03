@@ -1,0 +1,30 @@
+# endpoints.txt — Papister endpoint collection
+# ─────────────────────────────────────────────
+# One URL per line. Lines starting with # are comments.
+# Optional: prefix with METHOD (GET POST PUT PATCH DELETE)
+# Default method is GET when no prefix is given.
+#
+# Example entries below — replace with your real targets.
+
+# ── Public / health checks ───────────────────────────────
+GET  https://httpbin.org/get
+POST https://httpbin.org/post
+GET  https://httpbin.org/status/200
+GET  https://httpbin.org/status/404
+GET  https://httpbin.org/status/500
+
+# ── Auth testing ─────────────────────────────────────────
+GET  https://httpbin.org/bearer
+GET  https://httpbin.org/basic-auth/user/pass
+
+# ── Redirect behaviour ────────────────────────────────────
+GET  https://httpbin.org/redirect/3
+GET  https://httpbin.org/absolute-redirect/5
+
+# ── Delay / timeout testing ───────────────────────────────
+GET  https://httpbin.org/delay/2
+GET  https://httpbin.org/delay/20
+
+# ── Your targets go below ─────────────────────────────────
+# GET  https://api.yourdomain.com/v1/users
+# POST https://api.yourdomain.com/v1/login

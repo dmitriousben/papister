@@ -1,0 +1,53 @@
+# endpoints.yaml — Papister structured collection
+# ─────────────────────────────────────────────────
+# Full format: every field documented.
+# Only 'url' is required.
+
+# ── Public health / smoke tests ──────────────────────────
+- url: https://httpbin.org/get
+  method: GET
+  tags: [smoke, public]
+  note: Basic GET — should always return 200
+
+- url: https://httpbin.org/post
+  method: POST
+  json_body:
+    test: papister
+    version: "0.1.0"
+  tags: [smoke, public]
+
+- url: https://httpbin.org/status/404
+  method: GET
+  tags: [smoke, error-codes]
+  note: Expect 404 — tests broken detection
+
+- url: https://httpbin.org/status/500
+  method: GET
+  tags: [smoke, error-codes]
+  note: Expect 500 — tests server_error detection
+
+# ── Auth-protected endpoints ──────────────────────────────
+- url: https://httpbin.org/bearer
+  method: GET
+  auth_profile: my_bearer        # papister auth set my_bearer --type oauth2
+  tags: [auth, protected]
+
+- url: https://httpbin.org/basic-auth/user/pass
+  method: GET
+  auth_profile: my_basic         # papister auth set my_basic --type basic
+  tags: [auth, basic]
+
+# ── Custom headers ────────────────────────────────────────
+- url: https://httpbin.org/headers
+  method: GET
+  headers:
+    X-Custom-Client: Papister
+    X-Request-Source: local-test
+  tags: [headers]
+
+# ── Mpesa sandbox example ─────────────────────────────────
+# - url: https://sandbox.safaricom.co.ke/oauth/v1/generate
+#   method: GET
+#   mode: S
+#   auth_profile: mpesa_consumer   # consumer key+secret → OAuth1
+#   tags: [mpesa, auth, sandbox]
