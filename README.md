@@ -9,9 +9,8 @@ But a brief explanation is cool..
 
 ## What Papister does
 
-Papister is a local API security and testing toolkit built for developers who test their own APIs, third-party integrations (Mpesa, Binance, Stripe, Africa's Talking, etc.), and want to go deep on security without opening Postman or Burp Suite.## What Papister does
-
 Papister is a local API security and testing toolkit built for developers who test their own APIs, third-party integrations (Binance, Stripe, Africa's Talking, etc.), and want to go deep on security without opening Postman or Burp Suite.
+
 ## Build instructions
 
 ### 1. Requirements
