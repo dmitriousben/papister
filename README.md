@@ -25,15 +25,9 @@ python3 --version
 
 ---
 
-### 2. Clone or unzip
+### 2. Clone 
 
-If you have the folder as a zip, unzip it:
-```bash
-unzip papister.zip -d papister
-cd papister
-```
-
-Or if you cloned from git:
+ clone from git:
 ```bash
 git clone <your-repo-url>
 cd papister
@@ -115,10 +109,10 @@ python cli.py report
 
 ---
 
-### 8. Set up your first vault entry (Mpesa example)
+### 8. Set up your first vault entry 
 
 ```bash
-python cli.py vault set mpesa
+python cli.py vault set binance
 ```
 
 Papister will prompt:
@@ -218,12 +212,6 @@ That's it. Nothing else needs to change.
 
 ---
 
-## Adding a new security module (future — v0.1.1)
-
-Planned:
-- `security/jwt.py` — algorithm confusion, claim tampering, weak secret brute-force
-- `security/graphql.py` — introspection, batching, deep nesting, mutation testing
-- `security/soap.py` — WSDL discovery, XXE injection, SOAPAction spoofing
 
 ---
 
@@ -248,14 +236,14 @@ Planned:
 
 Make papister your favourite too
 
-support my project guys..|||
+### Support my project guys..|||
 
-Buy me coffee atleast i upgrade my machine 
+### Buy me coffee atleast i upgrade my machine 
 
 ### Bitcoin address
 bc1q4ez87z244vs7uxqyz4sernkamjx53kkd4uyksz
 
 
 
-# HappyWhenItHappens
-# DmitriousBen
+Tag: HappyWhenItHappens
+Author: DmitriousBen
