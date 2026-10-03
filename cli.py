@@ -1,4 +1,5 @@
 """
+HappyWhenItHappens
 cli.py — Papister v1.0.1 Entry Point
 ======================================
 All commands registered here. Logic lives in modules.
