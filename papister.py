@@ -1,8 +1,9 @@
 """
+HappyWhenItHappens
 Papister — Local API Security & Testing Toolkit
 ================================================
-Author  : You
-Version : 0.1.0
+Author  : DmitriousBen
+Version : 1.0.1
 License : MIT
 
 Every module imports VERSION, BANNER and path constants from here.
