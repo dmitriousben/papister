@@ -33,8 +33,8 @@ cve:
 
 integrations:
   mpesa:
-    sandbox_base:    "https://sandbox.safaricom.co.ke"
-    production_base: "https://api.safaricom.co.ke"
+    sandbox_base:    "https://sandbox.httpbin.org"
+    production_base: "https://api.httpbin.org"
 
   africastalking:
     sandbox_base:    "https://api.sandbox.africastalking.com"
